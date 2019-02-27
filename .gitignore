@@ -4,3 +4,4 @@
 *.xlsx
 data/anasonde/.DS_Store
 data/anasonde/._.DS_Store
+*.pyc
