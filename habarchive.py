@@ -29,7 +29,10 @@ mission_ids = []
 ID = []
 mean_ascent = []
 mean_descent = []
-
+descent_a = []
+descent_aerr = []
+descent_b = []
+descent_berr = []
 
 def openCSV(missionID):
     event = []
@@ -91,6 +94,7 @@ def processData(event, missionID, sealvlpress):
     bearings = []
     altitude = []
     alt2 = []
+
 
     for x in range(len(event) - 1):
         # print(event)
@@ -156,7 +160,13 @@ def processData(event, missionID, sealvlpress):
     mission_alt.append(max_alt)
 
     descentplot = np.column_stack((alt2, descent))
-    steve = descentAnalysis(alt2, descent)
+    popt, pcov = descentAnalysis(alt2, descent)
+
+    errs = np.sqrt(np.diag(pcov))
+    descent_a.append(popt[0])
+    descent_aerr.append(errs[0])
+    descent_b.append(popt[1])
+    descent_berr.append(errs[1])
 
     descent_df = pd.DataFrame(descentplot, columns=['Altitude', 'Speed'])
     descent_df.to_csv('results/abs%s-descent.csv' % missionID)
@@ -203,8 +213,8 @@ def writeExcel(missionID, datapool, ascent, descent):
 
 def missionData():
     writer = pd.ExcelWriter('results/abs-missions.xlsx', engine='xlsxwriter')
-    mission_df = pd.DataFrame([mission_ids, mission_bear, mission_dist, mission_alt, mean_ascent, mean_descent], index=[
-                              'Mission ID', 'Bearing', 'Distance', 'Max Altitude', 'Ascent Speed', 'Descent Speed'])
+    mission_df = pd.DataFrame([mission_ids, mission_bear, mission_dist, mission_alt, mean_ascent, descent_a, descent_aerr, descent_b, descent_berr], index=[
+                              'Mission ID', 'Bearing', 'Distance', 'Max Altitude', 'Ascent Speed', 'Descent A', 'DA error', 'Descent B', 'DB error'])
     mission_df.T.to_excel(writer, sheet_name='highlights')
     writer.save()
 
