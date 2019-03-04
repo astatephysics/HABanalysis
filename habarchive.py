@@ -159,6 +159,8 @@ def processData(event, missionID, sealvlpress):
     max_alt = max(altitude)
     mission_alt.append(max_alt)
 
+    mean_ascent.append(statistics.mean(ascent))
+    
     descentplot = np.column_stack((alt2, descent))
     popt, pcov = descentAnalysis(alt2, descent)
 
